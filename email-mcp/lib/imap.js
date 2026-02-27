@@ -146,6 +146,25 @@ export async function searchEmails({
   }
 }
 
+export async function markAsRead({ uids, folder = "INBOX" }) {
+  const client = await createClient();
+  await client.connect();
+
+  try {
+    const lock = await client.getMailboxLock(folder);
+
+    try {
+      const rangeStr = uids.join(",");
+      await client.messageFlagsAdd(rangeStr, ["\\Seen"], { uid: true });
+      return uids.length;
+    } finally {
+      lock.release();
+    }
+  } finally {
+    await client.logout();
+  }
+}
+
 export async function deleteEmails({ uids, folder = "INBOX" }) {
   const client = await createClient();
   await client.connect();

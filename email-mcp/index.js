@@ -7,7 +7,7 @@ config({ path: join(__dirname, ".env") });
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { listEmails, readEmail, searchEmails, deleteEmails } from "./lib/imap.js";
+import { listEmails, readEmail, searchEmails, markAsRead, deleteEmails } from "./lib/imap.js";
 
 const server = new McpServer({
   name: "email-mcp",
@@ -86,6 +86,19 @@ server.tool(
       preview: e.bodyText?.slice(0, 200),
     }));
     return { content: [{ type: "text", text: JSON.stringify(summary, null, 2) }] };
+  }
+);
+
+server.tool(
+  "mark_as_read",
+  "Mark emails as read by UIDs",
+  {
+    uids: z.array(z.string()).describe("List of email UIDs to mark as read"),
+    folder: z.string().optional().describe("Mailbox folder (default: INBOX)"),
+  },
+  async ({ uids, folder }) => {
+    const count = await markAsRead({ uids, folder });
+    return { content: [{ type: "text", text: `Marked ${count} email(s) as read.` }] };
   }
 );
 
