@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "linear-mcp": {
+      "type": "http",
+      "url": "https://mcp.linear.app/mcp"
+    },
+    "email-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["./email-mcp/index.js"]
+    }
+  }
+}
